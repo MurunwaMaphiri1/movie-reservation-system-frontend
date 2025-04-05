@@ -130,7 +130,7 @@ export default function SeatReservations() {
 
         try {
 
-            const stripe = await loadStripe(pkkey)
+            const stripe = await loadStripe(pkKey)
             console.log(stripe)
 
             const res = await fetch(`https://localhost:7035/api/moviereservations/create-checkout`, {
