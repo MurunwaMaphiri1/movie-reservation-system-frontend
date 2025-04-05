@@ -19,6 +19,7 @@ export default function SeatReservations() {
 
     const date = searchParams.get("date");
     const time = searchParams.get("time");
+    const pkKey = `${import.meta.VITE_PK_TEST_KEY}`;
 
     useEffect(() => {
         const fetchMovieName = async() => {
@@ -72,8 +73,7 @@ export default function SeatReservations() {
     useEffect(() => {
         const fetchTakenSeats = async() => {
             try {
-                const formattedDate = new Date(date).toISOString().split("T")[0] + "T02:00:00+02";
-                const res = await fetch(`https://localhost:7035/api/moviereservations/taken-seats/${id}/${formattedDate}/${timeSlotId}`, {
+                const res = await fetch(`https://localhost:7035/api/moviereservations/taken-seats/${id}/${date}/${timeSlotId}`, {
                     method: "GET",
                     mode: "cors",
                     credentials: "same-origin",
@@ -88,8 +88,9 @@ export default function SeatReservations() {
     
                 const takenSeats = await res.json();
                 setOccupiedSeats(takenSeats);
-                console.log(takenSeats);
-                console.log(`https://localhost:7035/api/moviereservations/taken-seats/${id}/${formattedDate}/${timeSlotId}`)
+                //Debugging Purposes
+                // console.log(takenSeats);
+                // console.log(`https://localhost:7035/api/moviereservations/taken-seats/${id}/${formattedDate}/${timeSlotId}`)
             } catch(error) {
                 console.error("Error fetching taken seats: ", error);
             }
@@ -131,6 +132,7 @@ export default function SeatReservations() {
         try {
 
             const stripe = await loadStripe("pk_test_51QkaCQBD5CAOtwjYNdM3DaUTKt33hhchTMKPXqBRpPRYi0rf5XQNVuRn5V3AF5Wiiz2AfbpF9v0E5ZzYgXw35t8E00YtCOEh5R")
+            console.log(stripe)
 
             const res = await fetch(`https://localhost:7035/api/moviereservations/create-checkout`, {
                 method: "POST",
@@ -141,7 +143,7 @@ export default function SeatReservations() {
                 body: JSON.stringify({             
                     UserId: parseInt(userId),
                     MovieId: parseInt(id),
-                    ReservationDate: new Date(date).toISOString(),
+                    ReservationDate: date,
                     TimeSlotId: timeSlotId,
                     SeatNumbers: selectedSeats, })
             });
