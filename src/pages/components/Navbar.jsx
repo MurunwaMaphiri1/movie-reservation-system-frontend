@@ -21,7 +21,6 @@ function NavBar() {
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-                console.log(decodedToken);
                 setEmail(decodedToken.Email);
                 setName(decodedToken.Name);
             } catch (error) {
