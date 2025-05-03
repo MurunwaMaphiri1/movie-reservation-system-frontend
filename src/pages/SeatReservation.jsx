@@ -144,7 +144,7 @@ export default function SeatReservations() {
                     UserId: parseInt(userId),
                     MovieId: parseInt(id),
                     ReservationDate: date,
-                    TimeSlotId: timeSlotId,
+                    TimeSlotId: parseInt(timeSlotId),
                     SeatNumbers: selectedSeats, })
             });
 
