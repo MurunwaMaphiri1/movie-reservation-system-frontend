@@ -53,7 +53,7 @@ export default function MyReservations() {
 
     const cancelReservation = async (id) => {
         try {
-            const res = await fetch(`https://localhost:7035/api/moviereservations/delete/${id}`, {
+            const res = await fetch(`https://localhost:7035/api/moviereservations/delete?id=${id}`, {
                 method: "DELETE",
                 mode: "cors",
                 credentials: "same-origin",
