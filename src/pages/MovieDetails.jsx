@@ -118,6 +118,14 @@ export default function MovieDetails() {
         return <div className="flex justify-center items-center h-screen">No movie data found.</div>;
     }
 
+    function isTimePassed(dateString, timeString) {
+        const now = new Date();
+
+        const selectedDateTime = new Date(`${dateString}T${timeString}:00`);
+
+        return selectedDateTime < now;
+    } 
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
             <div className="max-w-4xl w-full">
@@ -222,11 +230,11 @@ export default function MovieDetails() {
                 </div>
                 
                 <div
-                    className="col-sm-4 col-xs-12 bg-white border border-gray-200 pt-1.5 pb-2 pl-6 mb-4 mr-4"
+                    className="col-sm-4 w-full col-xs-12 bg-gray-800 border rounded-lg border-gray-800 pt-1.5 pb-2 pl-6 mb-4 mr-4"
                 >
                 <div className="row">
                     <div className="col-xs-6">
-                        <span className="text-sm text-gray-600">Ticket type</span>
+                        <span className="text-sm text-gray-300">Ticket type</span>
                         <h3 className="text-lg font-bold">VIP | 2D</h3>
                     </div>
                     <div className="col-xs-6 text-right">
@@ -238,14 +246,12 @@ export default function MovieDetails() {
                 <div className="row">
                     <div className="times_container grid grid-cols-3 gap-2 mt-4">
                         {timeSlots.map((timeSlot, index) => (
-                            <div key={index}>
-                                <button
-                                    onClick={() => handleTimeSelect(timeSlot.timeSlot || timeSlot)}
-                                    className="btn-time btn-block active_session bg-blue-500 text-white px-4 py-2 rounded block text-center"
-                                >
-                                    {timeSlot.timeSlot || timeSlot}
-                                </button>
-                            </div>
+                            <div key={index}> 
+                                <button onClick={() => handleTimeSelect(timeSlot.timeSlot || timeSlot)} 
+                                    className="btn-time cursor-pointer btn-block active_session bg-blue-500 text-white px-4 py-2 rounded block text-center" > 
+                                        {timeSlot.timeSlot || timeSlot} 
+                                </button> 
+                            </div> 
                         ))}
                     </div>
                 </div>
