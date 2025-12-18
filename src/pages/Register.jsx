@@ -34,7 +34,7 @@ export default function RegistrationPage() {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 flex items-center justify-center p-4">
       <div className="bg-zinc-900 p-8 rounded-xl w-full max-w-md relative">
         
         {/* Title */}
