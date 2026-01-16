@@ -8,6 +8,7 @@ import SeatReservations from './pages/SeatReservation';
 import Success from './pages/Success';
 import PaymentUnsuccessful from './pages/Failed';
 import MyReservations from './pages/MyReservations';
+import Footer from './pages/components/Footer';
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
             <Route path='/my-reservations' element={<MyReservations/>}/>
           </Routes>
         </div>
+        <Footer />
       </Router>
     </>
   )

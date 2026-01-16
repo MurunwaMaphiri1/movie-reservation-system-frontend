@@ -68,7 +68,6 @@ export default function MovieDetails() {
         fetchMovieDetails();
     }, [id]);
 
-    // Function to generate available dates (next 7 days)
     const getAvailableDates = () => {
         let dates = [];
         const today = new Date();
@@ -121,10 +120,17 @@ export default function MovieDetails() {
     function isTimePassed(dateString, timeString) {
         const now = new Date();
 
-        const selectedDateTime = new Date(`${dateString}T${timeString}:00`);
+        const [hours, minutes, seconds] = timeString.split(':');
 
-        return selectedDateTime < now;
-    } 
+        const slotDateTime = new Date(dateString);
+        slotDateTime.setHours(hours, minutes, seconds);
+
+        return slotDateTime < now;
+    }
+
+    const availableTimeSlots = timeSlots.filter(slot => {
+        return !isTimePassed(selectedDate, slot.timeSlot || slot);
+    })
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
@@ -232,29 +238,42 @@ export default function MovieDetails() {
                 <div
                     className="col-sm-4 w-full col-xs-12 bg-gray-800 border rounded-lg border-gray-800 pt-1.5 pb-2 pl-6 mb-4 mr-4"
                 >
-                <div className="row">
-                    <div className="col-xs-6">
+                <div className="flex flex-row justify-between">
+                    <div className="">
                         <span className="text-sm text-gray-300">Ticket type</span>
-                        <h3 className="text-lg font-bold">VIP | 2D</h3>
+                        <h3 className="text-m font-bold">VIP | 2D</h3>
                     </div>
-                    <div className="col-xs-6 text-right">
+                    <div className="col-xs-1 text-right">
                         <h3 className="text-lg font-bold">
                             <span className="pr-2.5">R&nbsp;{selectedMovie.ticketPrice}</span>
                         </h3>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="times_container grid grid-cols-3 gap-2 mt-4">
-                        {timeSlots.map((timeSlot, index) => (
-                            <div key={index}> 
-                                <button onClick={() => handleTimeSelect(timeSlot.timeSlot || timeSlot)} 
-                                    className="btn-time cursor-pointer btn-block active_session bg-blue-500 text-white px-4 py-2 rounded block text-center" > 
-                                        {timeSlot.timeSlot || timeSlot} 
-                                </button> 
-                            </div> 
-                        ))}
+                {availableTimeSlots.length === 0 ? (
+                        <p className="text-red-500 mt-2 font-bold">No available timeslots for selected date</p>
+                ) : (
+                    <div className="row">
+                        <div className="times_container grid grid-cols-3 gap-2 mt-4">
+                            {timeSlots.map((timeSlot, index) => {
+                                const time = timeSlot.timeSlot || timeSlot;
+
+                                if (isTimePassed(selectedDate, time)) {
+                                    return null;
+                                }
+
+                                return (
+                                    <div key={index}> 
+                                        <button onClick={() => handleTimeSelect(timeSlot.timeSlot || timeSlot)} 
+                                            className="btn-time cursor-pointer btn-block active_session bg-purple-600 text-white px-4 py-2 rounded block text-center" > 
+                                                {timeSlot.timeSlot || timeSlot} 
+                                        </button> 
+                                    </div> 
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
+                )
+                }
             </div>
             </div>
         </div>
