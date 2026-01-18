@@ -81,13 +81,11 @@ export default function MovieDetails() {
         return dates;
     };
     
-    // Format date for display
     const formatDateForDisplay = (date) => {
         const options = { weekday: 'short', month: 'short', day: 'numeric', timezone: 'Africa/Johannesburg' };
         return date.toLocaleDateString('en-ZA', options);
     };
     
-    // Check if date is today
     const isToday = (date) => {
         const today = new Date();
         return date.getDate() === today.getDate() &&
@@ -95,7 +93,6 @@ export default function MovieDetails() {
                date.getFullYear() === today.getFullYear();
     };
     
-    // Handle date selection
     const handleDateSelect = (date) => {
         setSelectedDate(date.toISOString().split('T')[0]);
     };
@@ -203,6 +200,28 @@ export default function MovieDetails() {
                 </div><br></br>
                 <hr></hr>
                 <br></br>
+
+                {/* Trailer section */}
+                <div className="mb-4">
+                    <h2 className="text-2xl text-cyan-400 mb-4">Trailer:</h2>
+                </div>
+                <div className="">
+                    <iframe
+                        width="100%"
+                        height="400"
+                        src={selectedMovie.trailer}
+                        title="Movie Trailer"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="rounded-lg shadow-lg"
+                    ></iframe>
+                </div>
+                <br></br>
+                <hr></hr>
+                <br></br>
+
+                {/* Date and Time Selection section */}
                 <div className="mb-4">
                     <h2 className="text-2xl text-cyan-400 mb-4">Confirm your date and time for reservation:</h2>
                 </div>
@@ -235,6 +254,7 @@ export default function MovieDetails() {
                     </div>
                 </div>
                 
+                {/* Time slot picker */}
                 <div
                     className="col-sm-4 w-full col-xs-12 bg-gray-800 border rounded-lg border-gray-800 pt-1.5 pb-2 pl-6 mb-4 mr-4"
                 >
@@ -272,8 +292,7 @@ export default function MovieDetails() {
                             })}
                         </div>
                     </div>
-                )
-                }
+                )}
             </div>
             </div>
         </div>

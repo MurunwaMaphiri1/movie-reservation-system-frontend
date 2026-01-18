@@ -13,7 +13,7 @@ export default function SeatReservations() {
     const [movieName, setMovieName] = useState("");
     const [timeSlotId, setTimeSlotId] = useState(0);
     const [occupiedSeats, setOccupiedSeats] = useState([]);
-    const [ticketPrice, setTicketPrice] = useState(100); // Default price per seat
+    const [ticketPrice, setTicketPrice] = useState(0);
     const [selectedMoviePoster, setSelectedMoviePoster] = useState(null);
 
     const date = searchParams.get("date");
@@ -39,6 +39,7 @@ export default function SeatReservations() {
                 const data = await name.json();
                 setMovieName(data.title);
                 setSelectedMoviePoster(data.image);
+                setTicketPrice(data.ticketPrice);
 
             } catch(error) {
                 console.error("Error occurred while fetching movie name: ", error);
@@ -164,7 +165,6 @@ export default function SeatReservations() {
     };
 
 
-    // Generate rows A-G and columns 1-13
     const rows = ["A", "B", "C", "D", "E", "F", "G"];
     const totalRows = rows.length;
     const columns = Array.from({ length: 13 }, (_, i) => i + 1);
@@ -181,7 +181,7 @@ export default function SeatReservations() {
                           />
                       </div>
                   </div>
-                    <h1 className="text-3xl font-bold text-white mb-2">{movieName}</h1>
+                    <h1 className="text-3xl font-bold text-center text-white mb-2">{movieName}</h1>
                     <div className="text-gray-300 mb-4">
                         <span>{date}</span> • <span>{time}</span>
                     </div>
