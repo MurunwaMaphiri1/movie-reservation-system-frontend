@@ -9,13 +9,15 @@ import Success from './pages/Success';
 import PaymentUnsuccessful from './pages/Failed';
 import MyReservations from './pages/MyReservations';
 import Footer from './pages/components/Footer';
+import AdminPanel from './pages/AdminPanel';
+import AdminSignIn from './pages/AdminSignIn';
 
 function App() {
 
   return (
     <>
       <Router>
-        <div className="flex flex-col min-h-screen bg-gray-900">
+        <div className="flex flex-col min-h-screen">
           <NavBar />
           <Routes>
             <Route path='/register' element={<Register/>}/>
@@ -27,6 +29,8 @@ function App() {
             <Route path='/confirm-reservation' element={<Success/>}/>
             <Route path='/cancelled-reservation' element={<PaymentUnsuccessful/>}/>
             <Route path='/my-reservations' element={<MyReservations/>}/>
+            <Route path='/admin-panel' element={<AdminPanel/>}/>
+            <Route path='/admin-sign-in' element={<AdminSignIn/>}/>
           </Routes>
         </div>
         <Footer />
