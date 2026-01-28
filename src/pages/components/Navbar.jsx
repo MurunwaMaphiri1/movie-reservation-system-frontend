@@ -6,6 +6,7 @@ function NavBar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [role, setRole] = useState("");
     const [username, setUsername] = useState(null);
     const navigate = useNavigate();
 
@@ -16,6 +17,13 @@ function NavBar() {
         navigate("/login");
     };
 
+    const adminLogOut = () => {
+        localStorage.removeItem("authToken");
+        setUsername(null);
+        setMenuOpen(false);
+        navigate("/admin-login");
+    }
+
     useEffect(() => {
         const token = localStorage.getItem("authToken");
         if (token) {
@@ -23,6 +31,7 @@ function NavBar() {
                 const decodedToken = jwtDecode(token);
                 setEmail(decodedToken.Email);
                 setName(decodedToken.Name);
+                setRole(decodedToken.Role);
             } catch (error) {
                 console.error("Error decoding token:", error);
             }
@@ -59,17 +68,36 @@ function NavBar() {
                             <span className="block text-sm text-gray-500 truncate dark:text-gray-400">{email || "Guest"}</span>
                         </div>
                         <ul className="py-2" aria-labelledby="user-menu-button">
-                            <li>
-                                <button onClick={() => navigate(`/my-reservations`)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Reservations</button>
-                            </li>
-                            <li>
-                                <button
-                                    onClick={logOut}
-                                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                                >
-                                    Sign out
-                                </button>
-                            </li>
+                            {role === "User" && (
+                                <>
+                                    <li>
+                                        <button onClick={() => navigate(`/my-reservations`)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Reservations</button>
+                                    </li>
+                                    <li>
+                                        <button
+                                            onClick={logOut}
+                                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                        >
+                                            Sign out
+                                        </button>
+                                    </li>
+                                </>
+                            )}
+                            {role === "Admin" || role === "Member" && (
+                                <>
+                                    <li>
+                                        <button onClick={() => navigate(`/my-reservations`)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Reservations</button>
+                                    </li>
+                                    <li>
+                                        <button
+                                            onClick={adminLogOut}
+                                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                        >
+                                            Sign out
+                                        </button>
+                                    </li>
+                                </>
+                            )}
                         </ul>
                     </div>
                 </div>

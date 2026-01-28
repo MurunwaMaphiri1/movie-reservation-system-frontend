@@ -31,7 +31,7 @@ export default function MyReservations() {
         
         setLoading(true);
         try {
-            const res = await fetch(`https://localhost:7035/api/moviereservations/search?userId=${userId}`, {
+            const res = await fetch(`https://localhost:7035/api/moviereservations/search-by-userId?userId=${userId}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
