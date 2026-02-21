@@ -11,7 +11,7 @@ export default function Login() {
   const handleSubmit = async(e) => {
     e.preventDefault();
     try {
-        const res = await fetch(`https://localhost:7035/api/user/login`, {
+        const res = await fetch(`http://localhost:7035/api/user/login`, {
             method: "POST",
             mode: "cors",
             credentials: "same-origin",

@@ -29,14 +29,14 @@ export default function MovieDetails() {
     useEffect(() => {
         const fetchMovieDetails = async () => {
             try {
-                const res = await fetch(`https://localhost:7035/api/movie/get-movie/movie-id/${id}`, {
+                const res = await fetch(`http://localhost:7035/api/movie/get-movie/movie-id/${id}`, {
                     method: "GET",
                     mode: "cors",
                     credentials: "same-origin",
                     headers: { "Content-Type": "application/json" },
                 });
 
-                const timeSlotRes = await fetch(`https://localhost:7035/api/timeslots/`, {
+                const timeSlotRes = await fetch(`http://localhost:7035/api/timeslots/`, {
                     method: "GET",
                     mode: "cors",
                     credentials: "same-origin",

@@ -14,7 +14,7 @@ function NavBar() {
         localStorage.removeItem("authToken");
         setUsername(null);
         setMenuOpen(false);
-        navigate("/login");
+        navigate("/userauth");
     };
 
     const adminLogOut = () => {
@@ -71,7 +71,7 @@ function NavBar() {
                             {role === "User" && (
                                 <>
                                     <li>
-                                        <button onClick={() => navigate(`/my-reservations`)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Reservations</button>
+                                        <button onClick={() => navigate(`/my-reservations`)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">My Reservations</button>
                                     </li>
                                     <li>
                                         <button
@@ -83,21 +83,21 @@ function NavBar() {
                                     </li>
                                 </>
                             )}
-                            {role === "Admin" || role === "Member" && (
-                                <>
-                                    <li>
+                            {/* {role === "Admin" || role === "Member" && (
+                                <> */}
+                                    {/* <li>
                                         <button onClick={() => navigate(`/my-reservations`)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Reservations</button>
                                     </li>
                                     <li>
                                         <button
-                                            onClick={adminLogOut}
+                                            onClick={() => navigate(`/login`)}
                                             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                                         >
                                             Sign out
                                         </button>
-                                    </li>
-                                </>
-                            )}
+                                    </li> */}
+                                {/* </>
+                            )} */}
                         </ul>
                     </div>
                 </div>

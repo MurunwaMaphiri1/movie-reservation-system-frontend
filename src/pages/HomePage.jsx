@@ -11,7 +11,7 @@ export default function HomePage() {
     // Function to fetch movies based on search input
     useEffect(() => {
         if (title.trim() === "") {
-            axios.get(`https://localhost:7035/api/movie`)
+            axios.get(`http://localhost:7035/api/movie`)
                 .then(response => setMovies(response.data))
                 .catch(err => setError(err.message));
         } else {
@@ -19,7 +19,7 @@ export default function HomePage() {
                 try {
                     // Encode the title to handle spaces (%20) and special characters
                     const encodedTitle = encodeURIComponent(title);
-                    const res = await fetch(`https://localhost:7035/api/movie/get-movie/movie-title/${encodedTitle}`, {
+                    const res = await fetch(`http://localhost:7035/api/movie/get-movie/movie-title/${encodedTitle}`, {
                         method: "GET",
                         headers: { "Content-Type": "application/json" }
                     });

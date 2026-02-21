@@ -23,7 +23,7 @@ export default function SeatReservations() {
     useEffect(() => {
         const fetchMovieName = async() => {
             try {
-                const name = await fetch(`https://localhost:7035/api/movie/get-movie/movie-id/${id}`, {
+                const name = await fetch(`http://localhost:7035/api/movie/get-movie/movie-id/${id}`, {
                     method: "GET",
                     mode: "cors",
                     credentials: "same-origin",
@@ -51,7 +51,7 @@ export default function SeatReservations() {
 
     useEffect(() => {
         const fetchTimeSlotId = async() => {
-            const timeres = await fetch(`https://localhost:7035/api/timeslots/get-timeSlotId-by-time-string?timeString=${time}`, {
+            const timeres = await fetch(`http://localhost:7035/api/timeslots/get-timeSlotId-by-time-string?timeString=${time}`, {
                 method: "GET",
                 mode: "cors",
                 credentials: "same-origin",
@@ -73,7 +73,7 @@ export default function SeatReservations() {
     useEffect(() => {
         const fetchTakenSeats = async() => {
             try {
-                const res = await fetch(`https://localhost:7035/api/moviereservations/taken-seats/${id}/${date}/${timeSlotId}`, {
+                const res = await fetch(`http://localhost:7035/api/moviereservations/taken-seats/${id}/${date}/${timeSlotId}`, {
                     method: "GET",
                     mode: "cors",
                     credentials: "same-origin",
@@ -134,7 +134,7 @@ export default function SeatReservations() {
             const stripe = await loadStripe(`${pkKey}`)
             console.log(stripe)
 
-            const res = await fetch(`https://localhost:7035/api/moviereservations/create-checkout`, {
+            const res = await fetch(`http://localhost:7035/api/moviereservations/create-checkout`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

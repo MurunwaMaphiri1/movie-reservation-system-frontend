@@ -31,7 +31,7 @@ export default function MyReservations() {
         
         setLoading(true);
         try {
-            const res = await fetch(`https://localhost:7035/api/moviereservations/search-by-userId?userId=${userId}`, {
+            const res = await fetch(`http://localhost:7035/api/moviereservations/search-by-userId?userId=${userId}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -53,7 +53,7 @@ export default function MyReservations() {
 
     const cancelReservation = async (id) => {
         try {
-            const res = await fetch(`https://localhost:7035/api/moviereservations/delete?id=${id}`, {
+            const res = await fetch(`http://localhost:7035/api/moviereservations/delete?id=${id}`, {
                 method: "DELETE",
                 mode: "cors",
                 credentials: "same-origin",

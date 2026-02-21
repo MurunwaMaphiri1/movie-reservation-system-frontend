@@ -20,7 +20,7 @@ function App() {
         <div className="flex flex-col min-h-screen">
           <NavBar />
           <Routes>
-            <Route path='/register' element={<Register/>}/>
+            <Route path='/userauth' element={<Register/>}/>
             <Route path='/login' element={<Login/>}/>
             <Route path='/' element={<HomePage/>}/>
             <Route path='/get-movie/movie-id/:id' element={<MovieDetails/>}/>
