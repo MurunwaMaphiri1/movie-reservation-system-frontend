@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './components/css/RegistrationPage.module.css';
+import SignUpBoxImg from "../../public/images/movie-night-fun_579077-260.jpg";
+import UserContext from '../constants/UserContext';
 
 export default function RegistrationPage() {
   const [message, setMessage] = useState("");
@@ -11,6 +13,7 @@ export default function RegistrationPage() {
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const [isSignIn, setIsSignIn] = useState(false);
+  const { setToken } = useContext(UserContext);
   const navigate = useNavigate();
 
   const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?!.*\s).{8,}$/;
@@ -38,6 +41,8 @@ export default function RegistrationPage() {
       });
 
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      //Debugging purposes
       // if (!res.ok) {
       //   const data = await res.json();
       //   console.log(`Error: `, data);
@@ -71,6 +76,7 @@ export default function RegistrationPage() {
 
       if (data.token) {
         localStorage.setItem('authToken', data.token);
+        setToken(data.token);
         console.log('Saved token:', localStorage.getItem('authToken')); // Debug log
         setMessage(data.message);
         setFullName(data.fullName)
@@ -91,7 +97,7 @@ return (
         {/* Register Box */}
         <div className={`${styles.user} ${styles.signinBx}`}>
           <div className={styles.imgBx}>
-            <img src="https://res.cloudinary.com/diyp1k5z5/image/upload/v1744874379/login-img_cdeenv.jpg" alt="Register" />
+            <img src={SignUpBoxImg} alt="Register" />
           </div>
           <div className={styles.formBx}>
             <form onSubmit={handleRegister}>
@@ -145,6 +151,7 @@ return (
           <div className={styles.formBx}>
             <form onSubmit={handleSignIn}>
               <h2>Sign In</h2>
+              {message && <p className={styles.message}>{message}</p>}
               <input
                 type="email"
                 placeholder="Email Address"
@@ -167,7 +174,7 @@ return (
             </form>
           </div>
           <div className={styles.imgBx}>
-            <img src="https://res.cloudinary.com/diyp1k5z5/image/upload/v1744874376/signup-img_daepqz.png" alt="Sign In" />
+            <img src={SignUpBoxImg} alt="Sign In" />
           </div>
         </div>
 

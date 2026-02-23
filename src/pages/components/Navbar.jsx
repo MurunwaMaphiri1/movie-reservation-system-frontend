@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import UserContext from "../../constants/UserContext";
 
 function NavBar() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -8,24 +9,25 @@ function NavBar() {
     const [email, setEmail] = useState("");
     const [role, setRole] = useState("");
     const [username, setUsername] = useState(null);
+    const { token, setToken } = useContext(UserContext);
     const navigate = useNavigate();
 
     const logOut = () => {
         localStorage.removeItem("authToken");
-        setUsername(null);
+        setToken(null);
         setMenuOpen(false);
         navigate("/userauth");
     };
 
-    const adminLogOut = () => {
-        localStorage.removeItem("authToken");
-        setUsername(null);
-        setMenuOpen(false);
-        navigate("/admin-login");
-    }
+    // const adminLogOut = () => {
+    //     localStorage.removeItem("authToken");
+    //     setUsername(null);
+    //     setMenuOpen(false);
+    //     navigate("/admin-login");
+    // }
 
     useEffect(() => {
-        const token = localStorage.getItem("authToken");
+        // const token = localStorage.getItem("authToken");
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
@@ -36,7 +38,7 @@ function NavBar() {
                 console.error("Error decoding token:", error);
             }
         }
-    }, []);
+    }, [token]);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
