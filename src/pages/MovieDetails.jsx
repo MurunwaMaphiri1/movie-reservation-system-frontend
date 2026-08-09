@@ -102,6 +102,11 @@ export default function MovieDetails() {
         navigate(`/seats/${userId}/${id}?date=${selectedDate}&time=${encodeURIComponent(time)}`);
     };
 
+    // const handleTimeSelect = (slot) => {
+    //     setSelectedTime(slot.timeSlot);
+    //     navigate(`/seats/${userId}/${id}?date=${selectedDate}&time=${encodeURIComponent(slot.timeSlot)}&timeSlotId=${slot.id}`);
+    // };
+
     if (loading) {
         return <div className="flex justify-center items-center h-screen">Loading...</div>;
     }

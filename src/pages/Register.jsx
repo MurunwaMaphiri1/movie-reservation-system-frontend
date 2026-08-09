@@ -5,7 +5,8 @@ import SignUpBoxImg from "../../public/images/movie-night-fun_579077-260.jpg";
 import UserContext from '../constants/UserContext';
 
 export default function RegistrationPage() {
-  const [message, setMessage] = useState("");
+  const [registerMessage, setRegisterMessage] = useState("");
+  const [signInMessage, setSignInMessage] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,6 +14,8 @@ export default function RegistrationPage() {
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const [isSignIn, setIsSignIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const { setToken } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -21,18 +24,21 @@ export default function RegistrationPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    if (isRegistering) return;
+
     if (!passwordPattern.test(password)) {
-      setMessage("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+      setRegisterMessage("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match");
+      setRegisterMessage("Passwords do not match");
       return;
     }
 
+    setIsRegistering(true);
     try {
-      const res = await fetch(`http://localhost:7035/api/user/register`, {
+      const res = await fetch(`http://localhost:7035/api/auth/register`, {
         method: "POST",
         mode: "cors",
         credentials: "same-origin",
@@ -46,23 +52,28 @@ export default function RegistrationPage() {
       // if (!res.ok) {
       //   const data = await res.json();
       //   console.log(`Error: `, data);
-      //   setMessage(data.message || "Error signing up, please try again");
+      //   setRegisterMessage(data.message || "Error signing up, please try again");
       //   return;
       // }
 
       const data = await res.json();
-      setMessage(data.message);
+      setRegisterMessage(data.message);
     } catch (error) {
       console.error("Error signing up: ", error);
-      setMessage("Error signing up, please try again");
+      setRegisterMessage("Error signing up, please try again");
+    } finally {
+      setIsRegistering(false);
     }
   };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
 
+    if (isSigningIn) return;
+
+    setIsSigningIn(true);
     try {
-      const res = await fetch(`http://localhost:7035/api/user/login`, {
+      const res = await fetch(`http://localhost:7035/api/auth/login`, {
         method: "POST",
         mode: "cors",
         credentials: "same-origin",
@@ -78,15 +89,15 @@ export default function RegistrationPage() {
         localStorage.setItem('authToken', data.token);
         setToken(data.token);
         console.log('Saved token:', localStorage.getItem('authToken')); // Debug log
-        setMessage(data.message);
-        setFullName(data.fullName)
       }
 
-      setMessage(data.message);
+      setSignInMessage(data.message);
       navigate("/");
     } catch (error) {
       console.error("Error signing in: ", error);
-      setMessage("Error signing in, please try again");
+      setSignInMessage("Error signing in, please try again");
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -117,12 +128,12 @@ return (
                 required
               />
               <ul className={styles.passwordRequirementsContainer}>
-                  <li className={styles.passwordRequirements}><span class="low-upper-case"><i class="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;1 lowercase &amp; 1 uppercase</li>
-                  <li className={styles.passwordRequirements}><span class="one-number"><i class="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 number (0-9)</li>
-                  <li className={styles.passwordRequirements}><span class="one-special-char"><i class="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 Special Character (@$!%*?&^#()[]{}|\\\\/−+_.:;=,~).</li>
-                  <li className={styles.passwordRequirements}><span class="eight-character"><i class="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;At least 8 characters long</li>
+                  <li className={styles.passwordRequirements}><span className="low-upper-case"><i className="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;1 lowercase &amp; 1 uppercase</li>
+                  <li className={styles.passwordRequirements}><span className="one-number"><i className="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 number (0-9)</li>
+                  <li className={styles.passwordRequirements}><span className="one-special-char"><i className="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 Special Character (@$!%*?&^#()[]{}|\\\\/−+_.:;=,~).</li>
+                  <li className={styles.passwordRequirements}><span className="eight-character"><i className="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;At least 8 characters long</li>
               </ul>
-              {message && <p className={styles.message}>{message}</p>}
+              {registerMessage && <p className={styles.message}>{registerMessage}</p>}
               <input
                 type="password"
                 placeholder="Create Password"
@@ -137,7 +148,7 @@ return (
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
-              <input type="submit" value="Register" />
+              <input type="submit" value="Register" disabled={isRegistering} />
               <p className={styles.signup}>
                 Already have an account?{" "}
                 <a href="#" onClick={(e) => { e.preventDefault(); setIsSignIn(true); }}>Sign In.</a>
@@ -151,7 +162,7 @@ return (
           <div className={styles.formBx}>
             <form onSubmit={handleSignIn}>
               <h2>Sign In</h2>
-              {message && <p className={styles.message}>{message}</p>}
+              {signInMessage && <p className={styles.message}>{signInMessage}</p>}
               <input
                 type="email"
                 placeholder="Email Address"
@@ -166,9 +177,9 @@ return (
                 onChange={(e) => setSignInPassword(e.target.value)}
                 required
               />
-              <input type="submit" value="Sign In" />
+              <input type="submit" value="Sign In" disabled={isSigningIn} />
               <p className={styles.signup}>
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <a href="#" onClick={(e) => { e.preventDefault(); setIsSignIn(false); }}>Sign Up.</a>
               </p>
             </form>
