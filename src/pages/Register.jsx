@@ -32,7 +32,7 @@ export default function RegistrationPage() {
     }
 
     try {
-      const res = await fetch(`http://localhost:7035/api/user/register`, {
+      const res = await fetch(`http://localhost:7035/api/auth/register`, {
         method: "POST",
         mode: "cors",
         credentials: "same-origin",
@@ -62,7 +62,7 @@ export default function RegistrationPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`http://localhost:7035/api/user/login`, {
+      const res = await fetch(`http://localhost:7035/api/auth/login`, {
         method: "POST",
         mode: "cors",
         credentials: "same-origin",
@@ -117,10 +117,10 @@ return (
                 required
               />
               <ul className={styles.passwordRequirementsContainer}>
-                  <li className={styles.passwordRequirements}><span class="low-upper-case"><i class="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;1 lowercase &amp; 1 uppercase</li>
-                  <li className={styles.passwordRequirements}><span class="one-number"><i class="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 number (0-9)</li>
-                  <li className={styles.passwordRequirements}><span class="one-special-char"><i class="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 Special Character (@$!%*?&^#()[]{}|\\\\/−+_.:;=,~).</li>
-                  <li className={styles.passwordRequirements}><span class="eight-character"><i class="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;At least 8 characters long</li>
+                  <li className={styles.passwordRequirements}><span className="low-upper-case"><i className="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;1 lowercase &amp; 1 uppercase</li>
+                  <li className={styles.passwordRequirements}><span className="one-number"><i className="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 number (0-9)</li>
+                  <li className={styles.passwordRequirements}><span className="one-special-char"><i className="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 Special Character (@$!%*?&^#()[]{}|\\\\/−+_.:;=,~).</li>
+                  <li className={styles.passwordRequirements}><span className="eight-character"><i className="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;At least 8 characters long</li>
               </ul>
               {message && <p className={styles.message}>{message}</p>}
               <input
@@ -168,7 +168,7 @@ return (
               />
               <input type="submit" value="Sign In" />
               <p className={styles.signup}>
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <a href="#" onClick={(e) => { e.preventDefault(); setIsSignIn(false); }}>Sign Up.</a>
               </p>
             </form>

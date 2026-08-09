@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; 
+import { jwtDecode } from "jwt-decode";
 import { loadStripe } from "@stripe/stripe-js";
+// import * as signalR from "@microsoft/signalr";
 
 export default function SeatReservations() {
     const { id } = useParams();
@@ -62,7 +63,7 @@ export default function SeatReservations() {
 
             if (!timeres.ok) {
                 throw new Error(`HTTP error: status: ${timeres.status}`);
-            } 
+            }
 
             const timeSlotId = await timeres.json();
             setTimeSlotId(timeSlotId);
@@ -81,11 +82,11 @@ export default function SeatReservations() {
                         "Content-Type": "application/json"
                     }
                 })
-    
+
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
-    
+
                 const takenSeats = await res.json();
                 setOccupiedSeats(takenSeats);
                 //Debugging Purposes
@@ -98,19 +99,58 @@ export default function SeatReservations() {
         fetchTakenSeats();
     }, [id, date, timeSlotId]);
 
-    const handleSeatClick = (seatId) => {
-        if (occupiedSeats.includes(seatId)) {
-            return; // Seat is occupied, do nothing
-        }
+    // const handleSeatClick = (seatId) => {
+    //     if (occupiedSeats.includes(seatId)) {
+    //         return; // Seat is occupied, do nothing
+    //     }
 
-        setSelectedSeats(prev => {
-            if (prev.includes(seatId)) {
-                return prev.filter(seat => seat !== seatId);
+    //     setSelectedSeats(prev => {
+    //         if (prev.includes(seatId)) {
+    //             return prev.filter(seat => seat !== seatId);
+    //         } else {
+    //             return [...prev, seatId];
+    //         }
+    //     });
+
+    // };
+
+    const handleSeatClick = async (seatId) => {
+        if (occupiedSeats.includes(seatId)) return;
+
+        const isSelected = selectedSeats.includes(seatId);
+
+        if (isSelected) {
+            setSelectedSeats(prev => prev.filter(seat => seat !== seatId));
+            await fetch("http://localhost:7035/api/seatlock/unlock", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    movieId: parseInt(id),
+                    date: date,
+                    timeSlotId: timeSlotId,
+                    userId: parseInt(userId),
+                    SeatNumbers: [seatId]
+                })
+            });
+        } else {
+            const res = await fetch("http://localhost:7035/api/seatlock/lock", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    movieId: parseInt(id),
+                    date: date,
+                    timeSlotId: timeSlotId,
+                    userId: parseInt(userId),
+                    seatNumbers: [seatId]
+                })
+            });
+
+            if (res.ok) {
+                setSelectedSeats(prev => [...prev, seatId])
             } else {
-                return [...prev, seatId];
+                alert("This seat is no longer available")
             }
-        });
-
+        }
     };
 
     const getSeatStatus = (seatId) => {
@@ -140,7 +180,7 @@ export default function SeatReservations() {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({             
+                body: JSON.stringify({
                     UserId: parseInt(userId),
                     MovieId: parseInt(id),
                     ReservationDate: date,
@@ -153,7 +193,7 @@ export default function SeatReservations() {
             }
 
             const data = await res.json();
-            
+
             // alert("Reservation successful!");
             await stripe.redirectToCheckout({ sessionId: data.sessionId })
 
@@ -216,7 +256,7 @@ export default function SeatReservations() {
                                     {columns.map((col) => {
                                         const seatId = `${row}${col}`;
                                         const status = getSeatStatus(seatId);
-                                        
+
                                         return (
                                             <button
                                                 key={seatId}
@@ -240,14 +280,14 @@ export default function SeatReservations() {
                     </div>
 
                     <div className="text-white mt-8 mb-6 text-center">
-                        You have selected <span className="text-blue-500 font-semibold">{selectedSeats.length}</span> seats 
+                        You have selected <span className="text-blue-500 font-semibold">{selectedSeats.length}</span> seats
                         for the total price of R <span className="text-blue-500 font-semibold">{selectedSeats.length * ticketPrice}</span>
                     </div>
 
                     <button
                         className={`px-8 py-3 rounded-lg font-semibold ${
-                            selectedSeats.length > 0 
-                                ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                            selectedSeats.length > 0
+                                ? 'bg-blue-500 hover:bg-blue-600 text-white'
                                 : 'bg-gray-600 text-gray-300 cursor-not-allowed'
                         } transition-colors duration-200`}
                         onClick={createReservation}
