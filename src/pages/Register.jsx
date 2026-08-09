@@ -5,7 +5,8 @@ import SignUpBoxImg from "../../public/images/movie-night-fun_579077-260.jpg";
 import UserContext from '../constants/UserContext';
 
 export default function RegistrationPage() {
-  const [message, setMessage] = useState("");
+  const [registerMessage, setRegisterMessage] = useState("");
+  const [signInMessage, setSignInMessage] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,12 +27,12 @@ export default function RegistrationPage() {
     if (isRegistering) return;
 
     if (!passwordPattern.test(password)) {
-      setMessage("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+      setRegisterMessage("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match");
+      setRegisterMessage("Passwords do not match");
       return;
     }
 
@@ -51,15 +52,15 @@ export default function RegistrationPage() {
       // if (!res.ok) {
       //   const data = await res.json();
       //   console.log(`Error: `, data);
-      //   setMessage(data.message || "Error signing up, please try again");
+      //   setRegisterMessage(data.message || "Error signing up, please try again");
       //   return;
       // }
 
       const data = await res.json();
-      setMessage(data.message);
+      setRegisterMessage(data.message);
     } catch (error) {
       console.error("Error signing up: ", error);
-      setMessage("Error signing up, please try again");
+      setRegisterMessage("Error signing up, please try again");
     } finally {
       setIsRegistering(false);
     }
@@ -88,15 +89,15 @@ export default function RegistrationPage() {
         localStorage.setItem('authToken', data.token);
         setToken(data.token);
         console.log('Saved token:', localStorage.getItem('authToken')); // Debug log
-        setMessage(data.message);
+        setSignInMessage(data.message);
         setFullName(data.fullName)
       }
 
-      setMessage(data.message);
+      setSignInMessage(data.message);
       navigate("/");
     } catch (error) {
       console.error("Error signing in: ", error);
-      setMessage("Error signing in, please try again");
+      setSignInMessage("Error signing in, please try again");
     } finally {
       setIsSigningIn(false);
     }
@@ -134,7 +135,7 @@ return (
                   <li className={styles.passwordRequirements}><span className="one-special-char"><i className="fa fa-file-text" aria-hidden="true"></i></span> &nbsp;1 Special Character (@$!%*?&^#()[]{}|\\\\/−+_.:;=,~).</li>
                   <li className={styles.passwordRequirements}><span className="eight-character"><i className="fa fa-file-text" aria-hidden="true"></i></span>&nbsp;At least 8 characters long</li>
               </ul>
-              {message && <p className={styles.message}>{message}</p>}
+              {registerMessage && <p className={styles.message}>{registerMessage}</p>}
               <input
                 type="password"
                 placeholder="Create Password"
@@ -163,7 +164,7 @@ return (
           <div className={styles.formBx}>
             <form onSubmit={handleSignIn}>
               <h2>Sign In</h2>
-              {message && <p className={styles.message}>{message}</p>}
+              {signInMessage && <p className={styles.message}>{signInMessage}</p>}
               <input
                 type="email"
                 placeholder="Email Address"
