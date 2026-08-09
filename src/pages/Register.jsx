@@ -13,6 +13,8 @@ export default function RegistrationPage() {
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const [isSignIn, setIsSignIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const { setToken } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -20,6 +22,8 @@ export default function RegistrationPage() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (isRegistering) return;
 
     if (!passwordPattern.test(password)) {
       setMessage("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
@@ -31,6 +35,7 @@ export default function RegistrationPage() {
       return;
     }
 
+    setIsRegistering(true);
     try {
       const res = await fetch(`http://localhost:7035/api/auth/register`, {
         method: "POST",
@@ -55,12 +60,17 @@ export default function RegistrationPage() {
     } catch (error) {
       console.error("Error signing up: ", error);
       setMessage("Error signing up, please try again");
+    } finally {
+      setIsRegistering(false);
     }
   };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
 
+    if (isSigningIn) return;
+
+    setIsSigningIn(true);
     try {
       const res = await fetch(`http://localhost:7035/api/auth/login`, {
         method: "POST",
@@ -87,6 +97,8 @@ export default function RegistrationPage() {
     } catch (error) {
       console.error("Error signing in: ", error);
       setMessage("Error signing in, please try again");
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -137,7 +149,7 @@ return (
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
-              <input type="submit" value="Register" />
+              <input type="submit" value="Register" disabled={isRegistering} />
               <p className={styles.signup}>
                 Already have an account?{" "}
                 <a href="#" onClick={(e) => { e.preventDefault(); setIsSignIn(true); }}>Sign In.</a>
@@ -166,7 +178,7 @@ return (
                 onChange={(e) => setSignInPassword(e.target.value)}
                 required
               />
-              <input type="submit" value="Sign In" />
+              <input type="submit" value="Sign In" disabled={isSigningIn} />
               <p className={styles.signup}>
                 Don&apos;t have an account?{" "}
                 <a href="#" onClick={(e) => { e.preventDefault(); setIsSignIn(false); }}>Sign Up.</a>

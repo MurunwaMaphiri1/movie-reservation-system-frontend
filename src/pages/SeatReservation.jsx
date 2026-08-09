@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import { loadStripe } from "@stripe/stripe-js";
 // import * as signalR from "@microsoft/signalr";
 
@@ -12,7 +11,7 @@ export default function SeatReservations() {
     const [error, setError] = useState(null);
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [movieName, setMovieName] = useState("");
-    const [timeSlotId, setTimeSlotId] = useState(0);
+    const [timeSlotId, setTimeSlotId] = useState(null);
     const [occupiedSeats, setOccupiedSeats] = useState([]);
     const [ticketPrice, setTicketPrice] = useState(0);
     const [selectedMoviePoster, setSelectedMoviePoster] = useState(null);
@@ -116,14 +115,17 @@ export default function SeatReservations() {
 
     const handleSeatClick = async (seatId) => {
         if (occupiedSeats.includes(seatId)) return;
+        if (timeSlotId === null) return;
 
         const isSelected = selectedSeats.includes(seatId);
 
         if (isSelected) {
-            setSelectedSeats(prev => prev.filter(seat => seat !== seatId));
-            await fetch("http://localhost:7035/api/seatlock/unlock", {
+            const res = await fetch("http://localhost:7035/api/seatlock/unlock", {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                },
                 body: JSON.stringify({
                     movieId: parseInt(id),
                     date: date,
@@ -132,10 +134,19 @@ export default function SeatReservations() {
                     SeatNumbers: [seatId]
                 })
             });
+
+            if (res.ok) {
+                setSelectedSeats(prev => prev.filter(seat => seat !== seatId));
+            } else {
+                alert("Failed to release seat. Please try again.");
+            }
         } else {
             const res = await fetch("http://localhost:7035/api/seatlock/lock", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                },
                 body: JSON.stringify({
                     movieId: parseInt(id),
                     date: date,
@@ -178,7 +189,7 @@ export default function SeatReservations() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`
+                    "Authorization": `Bearer ${localStorage.getItem('authToken')}`
                 },
                 body: JSON.stringify({
                     UserId: parseInt(userId),
