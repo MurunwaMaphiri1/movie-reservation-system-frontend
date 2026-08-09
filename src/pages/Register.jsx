@@ -89,8 +89,6 @@ export default function RegistrationPage() {
         localStorage.setItem('authToken', data.token);
         setToken(data.token);
         console.log('Saved token:', localStorage.getItem('authToken')); // Debug log
-        setSignInMessage(data.message);
-        setFullName(data.fullName)
       }
 
       setSignInMessage(data.message);
