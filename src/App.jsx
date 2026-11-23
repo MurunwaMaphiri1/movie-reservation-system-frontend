@@ -27,8 +27,7 @@ function App() {
               <Route path='/userauth' element={<UserAuthPage/>}/>
               <Route path='/' element={<HomePage/>}/>
               <Route path='/get-movie/movie-id/:id' element={<MovieDetails/>}/>
-              {/* <Route path='/seats/:id' element={<SeatReservations/>}/> */}
-              <Route path='/seats/:userId/:id' element={<SeatReservations/>}/>
+              <Route path='/seats/:id' element={<SeatReservations/>}/>
               <Route path='/confirm-reservation' element={<Success/>}/>
               <Route path='/cancelled-reservation' element={<PaymentUnsuccessful/>}/>
               <Route path='/my-reservations' element={<MyReservations/>}/>

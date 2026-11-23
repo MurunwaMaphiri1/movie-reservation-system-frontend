@@ -1,11 +1,21 @@
 import { jwtDecode } from "jwt-decode";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import UserContext from "../constants/UserContext";
 
 export default function MyReservations() {
     const [reservation, setReservation] = useState([]);
-    const [userId, setUserId] = useState(null);
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const userContext = useContext(UserContext);
+
+    // Token expired or invalid: clear it and send the user back to log in
+    const handleUnauthorized = () => {
+        localStorage.removeItem("authToken");
+        userContext?.setToken(null);
+        navigate("/userauth");
+    };
 
     useEffect(() => {
         const token = localStorage.getItem("authToken");
@@ -13,10 +23,8 @@ export default function MyReservations() {
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-                const id = decodedToken.Id;
-                setUserId(id);
                 setName(decodedToken.Name);
-                fetchUserReservations(id);
+                fetchUserReservations();
             } catch (error) {
                 console.error("Error occurred while decoding token: ", error);
                 setLoading(false);
@@ -26,17 +34,33 @@ export default function MyReservations() {
         }
     }, []);
 
-    const fetchUserReservations = async (userId) => {
-        if (!userId) return;
-        
+    const fetchUserReservations = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:7035/api/moviereservations/search-by-userId?userId=${userId}`, {
+            // The backend works out whose reservations these are from the token
+            const res = await fetch(`http://localhost:7035/api/moviereservations/my-reservations`, {
                 method: "GET",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("authToken")}`
                 }
             });
+
+            if (res.status === 401) {
+                handleUnauthorized();
+                return;
+            }
+
+            if (res.status === 429) {
+                alert("You're going a bit fast. Please wait a moment and refresh.");
+                return;
+            }
+
+            // 404 just means this user has no reservations yet
+            if (res.status === 404) {
+                setReservation([]);
+                return;
+            }
 
             if (!res.ok) {
                 throw new Error(`HTTP error!! status: ${res.status}`);
@@ -51,25 +75,25 @@ export default function MyReservations() {
         }
     };
 
-    const cancelReservation = async (id) => {
+    const cancelReservation = async (item) => {
         try {
-            const res = await fetch(`http://localhost:7035/api/moviereservations/delete?id=${id}`, {
+            // Reservation code + email prove ownership
+            const res = await fetch(`http://localhost:7035/api/moviereservations/delete?code=${encodeURIComponent(item.reservationCode)}&email=${encodeURIComponent(item.email)}`, {
                 method: "DELETE",
                 mode: "cors",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    id: id
-                })
+                credentials: "same-origin"
             });
+
+            if (res.status === 429) {
+                alert("You're going a bit fast. Please wait a moment and try again.");
+                return;
+            }
 
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            fetchUserReservations(userId);
+            fetchUserReservations();
         } catch (error) {
             console.error("Error occurred while cancelling reservation: ", error);
         }
@@ -117,7 +141,7 @@ export default function MyReservations() {
                                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
                                 >
                                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        {item.user?.fullName || `User ID: ${item.userId}`}
+                                        {item.fullName}
                                     </th>
                                     <td className="px-6 py-4">
                                         {item.movie?.title}
@@ -145,7 +169,7 @@ export default function MyReservations() {
                                     ) : (
                                         <td className="px-6 py-4">
                                             <button 
-                                                onClick={() => cancelReservation(item.id)}
+                                                onClick={() => cancelReservation(item)}
                                                 className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                                             >
                                                 Cancel Reservation

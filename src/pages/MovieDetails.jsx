@@ -1,4 +1,3 @@
-import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -9,22 +8,9 @@ export default function MovieDetails() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [userId, setUserId] = useState("");
     const [timeSlots, setTimeSlots] = useState([]);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [selectedTime, setSelectedTime] = useState("");
-
-        useEffect(() => {
-            const token = localStorage.getItem("authToken");
-            if (token) {
-                try {
-                    const decodedToken = jwtDecode(token);
-                    setUserId(decodedToken.Id);
-                } catch (error) {
-                    console.error("Error decoding token:", error);
-                }
-            }
-        }, []);
 
     useEffect(() => {
         const fetchMovieDetails = async () => {
@@ -99,7 +85,7 @@ export default function MovieDetails() {
 
     const handleTimeSelect = (time) => {
         setSelectedTime(time);
-        navigate(`/seats/${userId}/${id}?date=${selectedDate}&time=${encodeURIComponent(time)}`);
+        navigate(`/seats/${id}?date=${selectedDate}&time=${encodeURIComponent(time)}`);
     };
 
     // const handleTimeSelect = (slot) => {
