@@ -1,11 +1,44 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
+import { jwtDecode } from "jwt-decode";
 // import * as signalR from "@microsoft/signalr";
+
+// Random id for this browser session; the backend uses it to know who holds a seat lock
+const getHolderId = () => {
+    let holderId = sessionStorage.getItem("holderId");
+    if (!holderId) {
+        holderId = crypto.randomUUID();
+        sessionStorage.setItem("holderId", holderId);
+    }
+    return holderId;
+};
+
+// Returns the stored token and its claims, or null for guests and expired tokens
+const getSession = () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return null;
+    try {
+        const claims = jwtDecode(token);
+        if (claims.exp && claims.exp * 1000 < Date.now()) return null;
+        return { token, claims };
+    } catch {
+        return null;
+    }
+};
+
+const authHeader = () => {
+    const session = getSession();
+    return session ? { "Authorization": `Bearer ${session.token}` } : {};
+};
+
+const TOO_MANY_REQUESTS = "You're going a bit fast. Please wait a moment and try again.";
 
 export default function SeatReservations() {
     const { id } = useParams();
-    const { userId } = useParams();
+    const session = getSession();
+    const [fullName, setFullName] = useState(session?.claims.Name ?? "");
+    const [email, setEmail] = useState(session?.claims.Email ?? "");
 
     const [searchParams] = useSearchParams();
     const [error, setError] = useState(null);
@@ -124,19 +157,21 @@ export default function SeatReservations() {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                    ...authHeader()
                 },
                 body: JSON.stringify({
                     movieId: parseInt(id),
                     date: date,
                     timeSlotId: timeSlotId,
-                    userId: parseInt(userId),
-                    SeatNumbers: [seatId]
+                    holderId: getHolderId(),
+                    seatNumbers: [seatId]
                 })
             });
 
             if (res.ok) {
                 setSelectedSeats(prev => prev.filter(seat => seat !== seatId));
+            } else if (res.status === 429) {
+                alert(TOO_MANY_REQUESTS);
             } else {
                 alert("Failed to release seat. Please try again.");
             }
@@ -145,19 +180,21 @@ export default function SeatReservations() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                    ...authHeader()
                 },
                 body: JSON.stringify({
                     movieId: parseInt(id),
                     date: date,
                     timeSlotId: timeSlotId,
-                    userId: parseInt(userId),
+                    holderId: getHolderId(),
                     seatNumbers: [seatId]
                 })
             });
 
             if (res.ok) {
                 setSelectedSeats(prev => [...prev, seatId])
+            } else if (res.status === 429) {
+                alert(TOO_MANY_REQUESTS);
             } else {
                 alert("This seat is no longer available")
             }
@@ -179,25 +216,35 @@ export default function SeatReservations() {
             alert("Please select at least one seat.");
             return;
         }
+        if (!fullName.trim() || !email.trim()) {
+            alert("Please enter your name and email.");
+            return;
+        }
 
         try {
 
             const stripe = await loadStripe(`${pkKey}`)
-            console.log(stripe)
 
+            // UserId is not sent: the backend reads it from the token, and guests have none
             const res = await fetch(`http://localhost:7035/api/moviereservations/create-checkout`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                    ...authHeader()
                 },
                 body: JSON.stringify({
-                    UserId: parseInt(userId),
+                    FullName: fullName.trim(),
+                    Email: email.trim(),
                     MovieId: parseInt(id),
                     ReservationDate: date,
                     TimeSlotId: parseInt(timeSlotId),
                     SeatNumbers: selectedSeats, })
             });
+
+            if (res.status === 429) {
+                alert(TOO_MANY_REQUESTS);
+                return;
+            }
 
             if (!res.ok) {
                 throw new Error(`HTTP error: status: ${res.status}`);
@@ -295,14 +342,34 @@ export default function SeatReservations() {
                         for the total price of R <span className="text-blue-500 font-semibold">{selectedSeats.length * ticketPrice}</span>
                     </div>
 
+                    {/* Guests enter their details; logged-in users get them from the token */}
+                    {!session && (
+                        <div className="flex flex-col gap-3 w-full max-w-sm mb-6">
+                            <input
+                                type="text"
+                                placeholder="Full name"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                className="px-4 py-2 rounded bg-gray-800 text-white border border-gray-600"
+                            />
+                            <input
+                                type="email"
+                                placeholder="Email (your tickets are sent here)"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="px-4 py-2 rounded bg-gray-800 text-white border border-gray-600"
+                            />
+                        </div>
+                    )}
+
                     <button
                         className={`px-8 py-3 rounded-lg font-semibold ${
-                            selectedSeats.length > 0
+                            selectedSeats.length > 0 && fullName.trim() && email.trim()
                                 ? 'bg-blue-500 hover:bg-blue-600 text-white'
                                 : 'bg-gray-600 text-gray-300 cursor-not-allowed'
                         } transition-colors duration-200`}
                         onClick={createReservation}
-                        disabled={selectedSeats.length === 0}
+                        disabled={selectedSeats.length === 0 || !fullName.trim() || !email.trim()}
                     >
                         Book Tickets
                     </button>
